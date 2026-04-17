@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jhostin Noh · Física Aplicada</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-grid">
+      <div class="header-label">ENG · FÍS</div>
+      <nav class="header-nav">
+        <a href="#arduino">Termo-Color</a>
+        <a href="#calculadora">Calculadora C++</a>
+        <a href="#about">Sobre mí</a>
+      </nav>
+      <div class="header-year">2025</div>
+    </div>
+    <div class="hero">
+      <p class="hero-eyebrow">Portafolio de Proyectos</p>
+      <h1 class="hero-title">Física<br/><em>Aplicada</em></h1>
+      <p class="hero-sub">Jhostin Ofiel Noh Garma · Temas Selectos de Física Aplicada · 2025</p>
+      <div class="hero-rule"></div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ════ PROYECTO 1: TERMO-COLOR ════ -->
+    <section id="arduino" class="project project--arduino">
+      <div class="project-meta">
+        <span class="project-number">01</span>
+        <span class="project-tag">Hardware · Embebido · FastLED</span>
+      </div>
+      <div class="project-header">
+        <h2>Lámpara<br/><em>Termo-Color</em></h2>
+        <p class="project-desc">
+          Una lámpara inteligente que comunica la temperatura ambiente a través del color.
+          Un Arduino Uno lee el sensor DHT11 y controla una tira de 50 LEDs WS2811 con
+          FastLED: azul para frío, verde para confort y rojo para calor, con
+          transiciones suaves usando <code>map()</code>.
+        </p>
+      </div>
+
+      <!-- Simulador interactivo -->
+      <div class="led-simulator-card">
+        <div class="card-header">
+          <span class="card-header-dot"></span>
+          Simulador Interactivo · Tira WS2811 (50 LEDs)
+        </div>
+        <div class="led-simulator-body">
+          <div class="led-strip-container">
+            <div class="led-strip" id="ledStrip"></div>
+          </div>
+          <div class="simulator-controls">
+            <div class="temp-display-row">
+              <span class="temp-label">Temperatura</span>
+              <span class="temp-value" id="tempValue">22°C</span>
+              <span class="temp-color-name" id="colorName">Azul · Frío</span>
+            </div>
+            <input type="range" id="tempSlider" class="temp-slider"
+                   min="10" max="45" value="22" step="1" />
+            <div class="slider-labels">
+              <span>10°C</span><span>25°C</span><span>30°C</span><span>35°C</span><span>45°C</span>
+            </div>
+            <div class="color-zones-bar">
+              <div class="cz cz-cold"></div>
+              <div class="cz cz-trans1"></div>
+              <div class="cz cz-trans2"></div>
+              <div class="cz cz-hot"></div>
+            </div>
+            <div class="formula-display" id="formulaDisplay">r=0, g=0, b=255</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Diagrama -->
+      <div class="component-diagram">
+        <div class="diagram-title">Diagrama de Circuito</div>
+        <div class="diagram-circuit-img">
+          <img src="assets/img/circuit.png" alt="Diagrama circuito Termo-Color" />
+        </div>
+      </div>
+
+      <!-- Código -->
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <div class="code-dots">
+            <span class="dot dot--red"></span><span class="dot dot--yellow"></span><span class="dot dot--green"></span>
+          </div>
+          <div class="code-filename">Project_Termo-Color.ino</div>
+          <div class="code-lang">Arduino C++ · FastLED</div>
+        </div>
+        <div class="code-block">
+          <pre><code><span class="c-comment">// Supervisado por Jhostin Noh</span>
+
+<span class="c-include">#include</span> <span class="c-string">&lt;FastLED.h&gt;</span>
+<span class="c-include">#include</span> <span class="c-string">&lt;DHT.h&gt;</span>
+
+<span class="c-keyword">#define</span> <span class="c-macro">LED_PIN</span>      <span class="c-number">6</span>
+<span class="c-keyword">#define</span> <span class="c-macro">NUM_LEDS</span>     <span class="c-number">50</span>
+<span class="c-keyword">#define</span> <span class="c-macro">BRIGHTNESS</span>   <span class="c-number">100</span>
+<span class="c-keyword">#define</span> <span class="c-macro">LED_TYPE</span>     WS2811
+<span class="c-keyword">#define</span> <span class="c-macro">COLOR_ORDER</span>  BRG
+
+CRGB leds[<span class="c-macro">NUM_LEDS</span>];
+<span class="c-keyword">#define</span> <span class="c-macro">DHTPIN</span> <span class="c-number">2</span>
+<span class="c-keyword">#define</span> <span class="c-macro">DHTTYPE</span> DHT11
+DHT dht(<span class="c-macro">DHTPIN</span>, <span class="c-macro">DHTTYPE</span>);
+
+<span class="c-type">void</span> <span class="c-func">loop</span>() {
+  <span class="c-func">delay</span>(<span class="c-number">2000</span>);
+  <span class="c-type">float</span> t = dht.<span class="c-func">readTemperature</span>();
+  <span class="c-keyword">if</span> (<span class="c-func">isnan</span>(t)) { Serial.<span class="c-func">println</span>(<span class="c-string">"Error sensor"</span>); <span class="c-keyword">return</span>; }
+
+  <span class="c-type">int</span> tempInt = (<span class="c-type">int</span>)t;
+  <span class="c-type">int</span> r = <span class="c-number">0</span>, g = <span class="c-number">0</span>, b = <span class="c-number">0</span>;
+
+  <span class="c-keyword">if</span> (tempInt &lt;= <span class="c-number">25</span>) {
+    b = <span class="c-number">255</span>;                                           <span class="c-comment">// Azul puro</span>
+  } <span class="c-keyword">else if</span> (tempInt &lt;= <span class="c-number">30</span>) {
+    g = <span class="c-func">map</span>(tempInt, <span class="c-number">25</span>, <span class="c-number">30</span>, <span class="c-number">0</span>, <span class="c-number">255</span>);             <span class="c-comment">// Azul→Verde</span>
+    b = <span class="c-func">map</span>(tempInt, <span class="c-number">25</span>, <span class="c-number">30</span>, <span class="c-number">255</span>, <span class="c-number">0</span>);
+  } <span class="c-keyword">else if</span> (tempInt &lt;= <span class="c-number">35</span>) {
+    r = <span class="c-func">map</span>(tempInt, <span class="c-number">30</span>, <span class="c-number">35</span>, <span class="c-number">0</span>, <span class="c-number">255</span>);             <span class="c-comment">// Verde→Rojo</span>
+    g = <span class="c-func">map</span>(tempInt, <span class="c-number">30</span>, <span class="c-number">35</span>, <span class="c-number">255</span>, <span class="c-number">0</span>);
+  } <span class="c-keyword">else</span> {
+    r = <span class="c-number">255</span>;                                          <span class="c-comment">// Rojo puro</span>
+  }
+
+  <span class="c-func">fill_solid</span>(leds, <span class="c-macro">NUM_LEDS</span>, CRGB(r, g, b));
+  FastLED.<span class="c-func">show</span>();
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- Tabla materiales -->
+      <div class="specs-table-wrapper">
+        <div class="specs-title">Lista de Materiales · Especificaciones</div>
+        <table class="specs-table">
+          <thead><tr><th>Componente</th><th>Modelo</th><th>Conexión</th><th>Valor clave</th></tr></thead>
+          <tbody>
+            <tr><td>Microcontrolador</td><td>Arduino Uno R3</td><td>USB / DC Jack</td><td>5 V · 16 MHz</td></tr>
+            <tr><td>Sensor temperatura</td><td>DHT11</td><td>Pin D2</td><td>0–50 °C ± 2°C</td></tr>
+            <tr><td>Tira LED</td><td>WS2811 · 50 LEDs</td><td>Pin D6 (PWM)</td><td>BRG · 5 V · 3 A</td></tr>
+            <tr><td>Librería</td><td>FastLED</td><td>—</td><td>Brillo: 100/255</td></tr>
+            <tr><td>Fuente externa</td><td>Adaptador DC</td><td>Vin / GND</td><td>5 V · ≥ 3 A</td></tr>
+            <tr><td>Protoboard</td><td>830 puntos</td><td>—</td><td>Cables jumper M-M</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="section-divider">
+      <span class="divider-line"></span>
+      <span class="divider-label">siguiente proyecto</span>
+      <span class="divider-line"></span>
+    </div>
+
+    <!-- ════ PROYECTO 2: CALCULADORA ════ -->
+    <section id="calculadora" class="project project--cpp">
+      <div class="project-meta">
+        <span class="project-number">02</span>
+        <span class="project-tag">Software · C++17</span>
+      </div>
+      <div class="project-header">
+        <h2>Calculadora<br/><em>Multidisciplinaria</em></h2>
+        <p class="project-desc">
+          Aplicación de terminal con 5 módulos: Física Clásica, Oscilaciones y Ondas,
+          Electromagnetismo, Termodinámica y Convertidor Universal. Cada ecuación
+          permite despejar cualquier variable. La lógica del C++ original
+          corre aquí directamente en el navegador.
+        </p>
+      </div>
+
+      <!-- Terminal interactiva -->
+      <div class="terminal-wrapper">
+        <div class="terminal-titlebar">
+          <div class="terminal-dots">
+            <span class="dot dot--red"></span>
+            <span class="dot dot--yellow"></span>
+            <span class="dot dot--green"></span>
+          </div>
+          <div class="terminal-title">Calculadora_Final_v2 — Jhostin Noh</div>
+          <div class="terminal-badge">interactiva</div>
+        </div>
+        <div class="terminal-body" id="terminalBody"></div>
+        <div class="terminal-input-row">
+          <span class="t-prompt-inline">›</span>
+          <input type="text" id="terminalInput" class="terminal-input-field"
+                 autocomplete="off" autocorrect="off" spellcheck="false"
+                 placeholder="escribe tu selección y presiona Enter" />
+        </div>
+      </div>
+
+      <!-- Código fuente colapsable -->
+      <details class="code-details">
+        <summary class="code-details-summary">
+          Ver código fuente completo · Calculadora_Final_v2.cpp
+          <span class="summary-arrow">▸</span>
+        </summary>
+        <div class="code-block-wrapper code-details-inner">
+          <div class="code-block-header">
+            <div class="code-dots">
+              <span class="dot dot--red"></span><span class="dot dot--yellow"></span><span class="dot dot--green"></span>
+            </div>
+            <div class="code-filename">Calculadora_Final_v2.cpp</div>
+            <div class="code-lang">C++17</div>
+          </div>
+        <div class="code-block">
+            <pre>
+              <code>
+                <span class="c-include">#include</span> <span class="c-string">&lt;iostream&gt;</span>
+                <span class="c-include">#include</span> <span class="c-string">&lt;cmath&gt;</span>
+                <span class="c-keyword">using namespace</span> std;
+
+                <span class="c-keyword">namespace</span> Constantes {
+                  <span class="c-keyword">const</span> <span class="c-type">double</span> g   = <span class="c-number">9.81</span>;
+                  <span class="c-keyword">const</span> <span class="c-type">double</span> k_e = <span class="c-number">8.98755e9</span>;
+                  <span class="c-keyword">const</span> <span class="c-type">double</span> R   = <span class="c-number">8.314</span>;
+                  <span class="c-keyword">const</span> <span class="c-type">double</span> PI  = <span class="c-number">3.14159265359</span>;
+                }
+
+                <span class="c-comment">// --- PROTOTIPOS DE FUNCIONES ---</span>
+                <span class="c-type">void</span> menuPrincipal();
+                <span class="c-type">void</span> fisicaClasica();
+                <span class="c-type">void</span> oscilacionesOndas();
+                <span class="c-type">void</span> electromagnetismo();
+                <span class="c-type">void</span> termodinamica();
+                <span class="c-type">void</span> tablaConversiones();
+                <span class="c-type">void</span> pausar();
+                <span class="c-type">void</span> limpiarPantalla();
+
+                <span class="c-comment">// --- FUNCIÓN PRINCIPAL ---</span>
+                <span class="c-type">int</span> <span class="c-function">main</span>() {
+                    menuPrincipal();
+                    <span class="c-keyword">return</span> <span class="c-number">0</span>;
+                }
+
+                <span class="c-comment">// --- UTILIDADES ---</span>
+                <span class="c-type">void</span> limpiarPantalla() {
+                    <span class="c-include">#ifdef</span> _WIN32
+                        system(<span class="c-string">"cls"</span>);
+                    <span class="c-include">#else</span>
+                        system(<span class="c-string">"clear"</span>);
+                    <span class="c-include">#endif</span>
+                }
+
+                <span class="c-type">void</span> pausar() {
+                    cout &lt;&lt; <span class="c-string">"\nPresione Enter para continuar..."</span>;
+                    cin.ignore(numeric_limits&lt;<span class="c-type">streamsize</span>&gt;::max(), <span class="c-string">'\n'</span>);
+                    cin.get();
+                }
+
+                <span class="c-comment">// --- MENÚ PRINCIPAL ---</span>
+                <span class="c-type">void</span> menuPrincipal() {
+                    <span class="c-type">int</span> opcion;
+                    <span class="c-keyword">do</span> {
+                        limpiarPantalla();
+                        cout &lt;&lt; <span class="c-string">"=============================================="</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"    CALCULADORA MULTIDISCIPLINARIA DE FISICA"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"    Supervisado por JHOSTIN NOH"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"=============================================="</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"1. Fisica Clasica (Mecanica)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"2. Oscilaciones y Ondas"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"3. Electromagnetismo"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"4. Termodinamica"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"5. Tabla de Conversiones"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"6. Salir"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"------------------------------------------"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"Seleccione un area: "</span>;
+                        
+                        <span class="c-keyword">while</span> (!(cin &gt;&gt; opcion)) {
+                            cout &lt;&lt; <span class="c-string">"Entrada invalida. Ingrese un numero: "</span>;
+                            cin.clear();
+                            cin.ignore(numeric_limits&lt;<span class="c-type">streamsize</span>&gt;::max(), <span class="c-string">'\n'</span>);
+                        }
+
+                        <span class="c-keyword">switch</span> (opcion) {
+                            <span class="c-keyword">case</span> <span class="c-number">1</span>: fisicaClasica(); <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">2</span>: oscilacionesOndas(); <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">3</span>: electromagnetismo(); <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">4</span>: termodinamica(); <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">5</span>: tablaConversiones(); <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">6</span>: cout &lt;&lt; <span class="c-string">"Cerrando sistema..."</span> &lt;&lt; endl; <span class="c-keyword">break</span>;
+                            <span class="c-keyword">default</span>: cout &lt;&lt; <span class="c-string">"Opcion no valida."</span> &lt;&lt; endl; pausar(); <span class="c-keyword">break</span>;
+                        }
+                    } <span class="c-keyword">while</span> (opcion != <span class="c-number">6</span>);
+                }
+
+                <span class="c-comment">// --- MÓDULO 1: FÍSICA CLÁSICA (ACTUALIZADO) ---</span>
+                <span class="c-type">void</span> fisicaClasica() {
+                    <span class="c-type">int</span> op, var;
+                    <span class="c-type">double</span> F, m, a, Ec, v, W, d, P, vf, vi, t, h, theta, rad, Epg;
+
+                    <span class="c-keyword">do</span> {
+                        limpiarPantalla();
+                        cout &lt;&lt; <span class="c-string">"--- FISICA CLASICA ---"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"1. 2da Ley de Newton (F = m * a)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"2. Energia Cinetica (Ec = 0.5 * m * v^2)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"3. Trabajo Mecanico Simple (W = F * d)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"4. MRUA Velocidad Final (vf = vi + a * t)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"5. Peso (P = m * g)"</span> &lt;&lt; endl;
+                        <span class="c-comment">// --- NUEVAS OPCIONES ---</span>
+                        cout &lt;&lt; <span class="c-string">"6. Velocidad Media (v = d / t)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"7. 3ra Ley de Newton (Accion - Reaccion)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"8. MRUA Sin Tiempo (vf^2 = vi^2 + 2*a*d)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"9. Energia Potencial Gravitatoria (Ep = m * g * h)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"10. Trabajo Mecanico con Angulo (W = F*d*cos(theta))"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"11. Volver"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"Seleccione ecuacion: "</span>;
+                        cin &gt;&gt; op;
+
+                        <span class="c-keyword">if</span> (op == <span class="c-number">11</span>) <span class="c-keyword">return</span>;
+
+                        cout &lt;&lt; <span class="c-string">"\n--- Ingrese los datos en S.I. ---"</span> &lt;&lt; endl;
+
+                        <span class="c-keyword">switch</span> (op) {
+                            <span class="c-keyword">case</span> <span class="c-number">1</span>: <span class="c-comment">// F = ma</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.Fuerza(N), 2.Masa(kg), 3.Aceleracion(m/s^2): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span> (var == <span class="c-number">1</span>) { cout &lt;&lt; <span class="c-string">"m: "</span>; cin &gt;&gt; m; cout &lt;&lt; <span class="c-string">"a: "</span>; cin &gt;&gt; a; cout &lt;&lt; <span class="c-string">"F = "</span> &lt;&lt; m*a &lt;&lt; <span class="c-string">" N"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">2</span>) { cout &lt;&lt; <span class="c-string">"F: "</span>; cin &gt;&gt; F; cout &lt;&lt; <span class="c-string">"a: "</span>; cin &gt;&gt; a; <span class="c-keyword">if</span>(a!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"m = "</span> &lt;&lt; F/a &lt;&lt; <span class="c-string">" kg"</span>; <span class="c-keyword">else</span> cout &lt;&lt; <span class="c-string">"Error div/0"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">3</span>) { cout &lt;&lt; <span class="c-string">"F: "</span>; cin &gt;&gt; F; cout &lt;&lt; <span class="c-string">"m: "</span>; cin &gt;&gt; m; <span class="c-keyword">if</span>(m!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"a = "</span> &lt;&lt; F/m &lt;&lt; <span class="c-string">" m/s^2"</span>; <span class="c-keyword">else</span> cout &lt;&lt; <span class="c-string">"Error div/0"</span>; }
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">2</span>: <span class="c-comment">// Ec = 0.5 * m * v^2</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.Energia(J), 2.Masa(kg), 3.Velocidad(m/s): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span> (var == <span class="c-number">1</span>) { cout &lt;&lt; <span class="c-string">"m: "</span>; cin &gt;&gt; m; cout &lt;&lt; <span class="c-string">"v: "</span>; cin &gt;&gt; v; cout &lt;&lt; <span class="c-string">"Ec = "</span> &lt;&lt; <span class="c-number">0.5</span>*m*pow(v,<span class="c-number">2</span>) &lt;&lt; <span class="c-string">" J"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">2</span>) { cout &lt;&lt; <span class="c-string">"Ec: "</span>; cin &gt;&gt; Ec; cout &lt;&lt; <span class="c-string">"v: "</span>; cin &gt;&gt; v; <span class="c-keyword">if</span>(v!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"m = "</span> &lt;&lt; (<span class="c-number">2</span>*Ec)/pow(v,<span class="c-number">2</span>) &lt;&lt; <span class="c-string">" kg"</span>; <span class="c-keyword">else</span> cout &lt;&lt; <span class="c-string">"Error div/0"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">3</span>) { cout &lt;&lt; <span class="c-string">"Ec: "</span>; cin &gt;&gt; Ec; cout &lt;&lt; <span class="c-string">"m: "</span>; cin &gt;&gt; m; <span class="c-keyword">if</span>(m&gt;<span class="c-number">0</span> &amp;&amp; Ec&gt;=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"v = "</span> &lt;&lt; sqrt((<span class="c-number">2</span>*Ec)/m) &lt;&lt; <span class="c-string">" m/s"</span>; <span class="c-keyword">else</span> cout &lt;&lt; <span class="c-string">"Error raiz neg/div0"</span>; }
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">3</span>: <span class="c-comment">// W = F * d</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.Trabajo(J), 2.Fuerza(N), 3.Distancia(m): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span> (var == <span class="c-number">1</span>) { cout &lt;&lt; <span class="c-string">"F: "</span>; cin &gt;&gt; F; cout &lt;&lt; <span class="c-string">"d: "</span>; cin &gt;&gt; d; cout &lt;&lt; <span class="c-string">"W = "</span> &lt;&lt; F*d &lt;&lt; <span class="c-string">" J"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">2</span>) { cout &lt;&lt; <span class="c-string">"W: "</span>; cin &gt;&gt; W; cout &lt;&lt; <span class="c-string">"d: "</span>; cin &gt;&gt; d; <span class="c-keyword">if</span>(d!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"F = "</span> &lt;&lt; W/d &lt;&lt; <span class="c-string">" N"</span>; <span class="c-keyword">else</span> cout &lt;&lt; <span class="c-string">"Error div/0"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">3</span>) { cout &lt;&lt; <span class="c-string">"W: "</span>; cin &gt;&gt; W; cout &lt;&lt; <span class="c-string">"F: "</span>; cin &gt;&gt; F; <span class="c-keyword">if</span>(F!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"d = "</span> &lt;&lt; W/F &lt;&lt; <span class="c-string">" m"</span>; <span class="c-keyword">else</span> cout &lt;&lt; <span class="c-string">"Error div/0"</span>; }
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">4</span>: <span class="c-comment">// vf = vi + at</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.V_final, 2.V_inicial, 3.Aceleracion, 4.Tiempo: "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span> (var == <span class="c-number">1</span>) { cout &lt;&lt; <span class="c-string">"vi: "</span>; cin &gt;&gt; vi; cout &lt;&lt; <span class="c-string">"a: "</span>; cin &gt;&gt; a; cout &lt;&lt; <span class="c-string">"t: "</span>; cin &gt;&gt; t; cout &lt;&lt; <span class="c-string">"vf = "</span> &lt;&lt; vi + (a*t) &lt;&lt; <span class="c-string">" m/s"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">2</span>) { cout &lt;&lt; <span class="c-string">"vf: "</span>; cin &gt;&gt; vf; cout &lt;&lt; <span class="c-string">"a: "</span>; cin &gt;&gt; a; cout &lt;&lt; <span class="c-string">"t: "</span>; cin &gt;&gt; t; cout &lt;&lt; <span class="c-string">"vi = "</span> &lt;&lt; vf - (a*t) &lt;&lt; <span class="c-string">" m/s"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">3</span>) { cout &lt;&lt; <span class="c-string">"vf: "</span>; cin &gt;&gt; vf; cout &lt;&lt; <span class="c-string">"vi: "</span>; cin &gt;&gt; vi; cout &lt;&lt; <span class="c-string">"t: "</span>; cin &gt;&gt; t; <span class="c-keyword">if</span>(t!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"a = "</span> &lt;&lt; (vf-vi)/t &lt;&lt; <span class="c-string">" m/s^2"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">4</span>) { cout &lt;&lt; <span class="c-string">"vf: "</span>; cin &gt;&gt; vf; cout &lt;&lt; <span class="c-string">"vi: "</span>; cin &gt;&gt; vi; cout &lt;&lt; <span class="c-string">"a: "</span>; cin &gt;&gt; a; <span class="c-keyword">if</span>(a!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"t = "</span> &lt;&lt; (vf-vi)/a &lt;&lt; <span class="c-string">" s"</span>; }
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">5</span>: <span class="c-comment">// P = m * g</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.Peso(N), 2.Masa(kg): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span> (var == <span class="c-number">1</span>) { cout &lt;&lt; <span class="c-string">"m: "</span>; cin &gt;&gt; m; cout &lt;&lt; <span class="c-string">"P = "</span> &lt;&lt; m * Constantes::g &lt;&lt; <span class="c-string">" N"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">2</span>) { cout &lt;&lt; <span class="c-string">"P: "</span>; cin &gt;&gt; P; cout &lt;&lt; <span class="c-string">"m = "</span> &lt;&lt; P / Constantes::g &lt;&lt; <span class="c-string">" kg"</span>; }
+                                <span class="c-keyword">else</span> cout &lt;&lt; <span class="c-string">"Opcion invalida"</span>;
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">6</span>: <span class="c-comment">// Velocidad Media v = d/t</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.Velocidad(m/s), 2.Distancia(m), 3.Tiempo(s): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span> (var == <span class="c-number">1</span>) { cout &lt;&lt; <span class="c-string">"d: "</span>; cin &gt;&gt; d; cout &lt;&lt; <span class="c-string">"t: "</span>; cin &gt;&gt; t; <span class="c-keyword">if</span>(t!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"v = "</span> &lt;&lt; d/t &lt;&lt; <span class="c-string">" m/s"</span>; <span class="c-keyword">else</span> cout &lt;&lt; <span class="c-string">"Error div/0"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">2</span>) { cout &lt;&lt; <span class="c-string">"v: "</span>; cin &gt;&gt; v; cout &lt;&lt; <span class="c-string">"t: "</span>; cin &gt;&gt; t; cout &lt;&lt; <span class="c-string">"d = "</span> &lt;&lt; v*t &lt;&lt; <span class="c-string">" m"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">3</span>) { cout &lt;&lt; <span class="c-string">"d: "</span>; cin &gt;&gt; d; cout &lt;&lt; <span class="c-string">"v: "</span>; cin &gt;&gt; v; <span class="c-keyword">if</span>(v!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"t = "</span> &lt;&lt; d/v &lt;&lt; <span class="c-string">" s"</span>; <span class="c-keyword">else</span> cout &lt;&lt; <span class="c-string">"Error div/0"</span>; }
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">7</span>: <span class="c-comment">// 3ra Ley de Newton</span>
+                                cout &lt;&lt; <span class="c-string">"Principio de Accion y Reaccion."</span> &lt;&lt; endl;
+                                cout &lt;&lt; <span class="c-string">"Ingrese magnitud de Fuerza de Accion (N): "</span>; cin &gt;&gt; F;
+                                cout &lt;&lt; <span class="c-string">"Fuerza de Reaccion = "</span> &lt;&lt; -F &lt;&lt; <span class="c-string">" N (misma magnitud, sentido opuesto)"</span>;
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">8</span>: <span class="c-comment">// vf^2 = vi^2 + 2ad</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.V_final, 2.V_inicial, 3.Aceleracion, 4.Distancia: "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span> (var == <span class="c-number">1</span>) { 
+                                    cout &lt;&lt; <span class="c-string">"vi: "</span>; cin &gt;&gt; vi; cout &lt;&lt; <span class="c-string">"a: "</span>; cin &gt;&gt; a; cout &lt;&lt; <span class="c-string">"d: "</span>; cin &gt;&gt; d; 
+                                    <span class="c-type">double</span> val = pow(vi,<span class="c-number">2</span>) + <span class="c-number">2</span>*a*d;
+                                    <span class="c-keyword">if</span>(val &gt;= <span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"vf = "</span> &lt;&lt; sqrt(val) &lt;&lt; <span class="c-string">" m/s"</span>; <span class="c-keyword">else</span> cout &lt;&lt; <span class="c-string">"Error: raiz negativa"</span>;
+                                }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">2</span>) {
+                                    cout &lt;&lt; <span class="c-string">"vf: "</span>; cin &gt;&gt; vf; cout &lt;&lt; <span class="c-string">"a: "</span>; cin &gt;&gt; a; cout &lt;&lt; <span class="c-string">"d: "</span>; cin &gt;&gt; d;
+                                    <span class="c-type">double</span> val = pow(vf,<span class="c-number">2</span>) - <span class="c-number">2</span>*a*d;
+                                    <span class="c-keyword">if</span>(val &gt;= <span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"vi = "</span> &lt;&lt; sqrt(val) &lt;&lt; <span class="c-string">" m/s"</span>; <span class="c-keyword">else</span> cout &lt;&lt; <span class="c-string">"Error: raiz negativa"</span>;
+                                }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">3</span>) {
+                                    cout &lt;&lt; <span class="c-string">"vf: "</span>; cin &gt;&gt; vf; cout &lt;&lt; <span class="c-string">"vi: "</span>; cin &gt;&gt; vi; cout &lt;&lt; <span class="c-string">"d: "</span>; cin &gt;&gt; d;
+                                    <span class="c-keyword">if</span>(d!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"a = "</span> &lt;&lt; (pow(vf,<span class="c-number">2</span>) - pow(vi,<span class="c-number">2</span>))/(<span class="c-number">2</span>*d) &lt;&lt; <span class="c-string">" m/s^2"</span>; <span class="c-keyword">else</span> cout &lt;&lt; <span class="c-string">"Error div/0"</span>;
+                                }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">4</span>) {
+                                    cout &lt;&lt; <span class="c-string">"vf: "</span>; cin &gt;&gt; vf; cout &lt;&lt; <span class="c-string">"vi: "</span>; cin &gt;&gt; vi; cout &lt;&lt; <span class="c-string">"a: "</span>; cin &gt;&gt; a;
+                                    <span class="c-keyword">if</span>(a!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"d = "</span> &lt;&lt; (pow(vf,<span class="c-number">2</span>) - pow(vi,<span class="c-number">2</span>))/(<span class="c-number">2</span>*a) &lt;&lt; <span class="c-string">" m"</span>; <span class="c-keyword">else</span> cout &lt;&lt; <span class="c-string">"Error div/0"</span>;
+                                }
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">9</span>: <span class="c-comment">// Energia Potencial Gravitatoria Ep = mgh</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.E_Potencial(J), 2.Masa(kg), 3.Altura(m): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span> (var == <span class="c-number">1</span>) { cout &lt;&lt; <span class="c-string">"m: "</span>; cin &gt;&gt; m; cout &lt;&lt; <span class="c-string">"h: "</span>; cin &gt;&gt; h; cout &lt;&lt; <span class="c-string">"Ep = "</span> &lt;&lt; m * Constantes::g * h &lt;&lt; <span class="c-string">" J"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">2</span>) { cout &lt;&lt; <span class="c-string">"Ep: "</span>; cin &gt;&gt; Epg; cout &lt;&lt; <span class="c-string">"h: "</span>; cin &gt;&gt; h; <span class="c-keyword">if</span>(h!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"m = "</span> &lt;&lt; Epg / (Constantes::g * h) &lt;&lt; <span class="c-string">" kg"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">3</span>) { cout &lt;&lt; <span class="c-string">"Ep: "</span>; cin &gt;&gt; Epg; cout &lt;&lt; <span class="c-string">"m: "</span>; cin &gt;&gt; m; <span class="c-keyword">if</span>(m!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"h = "</span> &lt;&lt; Epg / (m * Constantes::g) &lt;&lt; <span class="c-string">" m"</span>; }
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">10</span>: <span class="c-comment">// Trabajo con Angulo W = F d cos(theta)</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.Trabajo(J), 2.Fuerza(N), 3.Distancia(m): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span> (var == <span class="c-number">1</span>) { 
+                                    cout &lt;&lt; <span class="c-string">"F: "</span>; cin &gt;&gt; F; cout &lt;&lt; <span class="c-string">"d: "</span>; cin &gt;&gt; d; cout &lt;&lt; <span class="c-string">"Angulo (grados): "</span>; cin &gt;&gt; theta;
+                                    rad = theta * Constantes::PI / <span class="c-number">180.0</span>; 
+                                    cout &lt;&lt; <span class="c-string">"W = "</span> &lt;&lt; F * d * cos(rad) &lt;&lt; <span class="c-string">" J"</span>; 
+                                }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">2</span>) {
+                                    cout &lt;&lt; <span class="c-string">"W: "</span>; cin &gt;&gt; W; cout &lt;&lt; <span class="c-string">"d: "</span>; cin &gt;&gt; d; cout &lt;&lt; <span class="c-string">"Angulo (grados): "</span>; cin &gt;&gt; theta;
+                                    rad = theta * Constantes::PI / <span class="c-number">180.0</span>;
+                                    <span class="c-keyword">if</span> (d!=<span class="c-number">0</span> &amp;&amp; cos(rad)!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"F = "</span> &lt;&lt; W / (d * cos(rad)) &lt;&lt; <span class="c-string">" N"</span>; <span class="c-keyword">else</span> cout &lt;&lt; <span class="c-string">"Error mat."</span>;
+                                }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">3</span>) {
+                                    cout &lt;&lt; <span class="c-string">"W: "</span>; cin &gt;&gt; W; cout &lt;&lt; <span class="c-string">"F: "</span>; cin &gt;&gt; F; cout &lt;&lt; <span class="c-string">"Angulo (grados): "</span>; cin &gt;&gt; theta;
+                                    rad = theta * Constantes::PI / <span class="c-number">180.0</span>;
+                                    <span class="c-keyword">if</span> (F!=<span class="c-number">0</span> &amp;&amp; cos(rad)!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"d = "</span> &lt;&lt; W / (F * cos(rad)) &lt;&lt; <span class="c-string">" m"</span>; <span class="c-keyword">else</span> cout &lt;&lt; <span class="c-string">"Error mat."</span>;
+                                }
+                                <span class="c-keyword">break</span>;
+                        }
+                        cout &lt;&lt; endl;
+                        pausar();
+                    } <span class="c-keyword">while</span> (op != <span class="c-number">11</span>);
+                }
+
+                <span class="c-comment">// --- MÓDULO 2: OSCILACIONES Y ONDAS ---</span>
+                <span class="c-type">void</span> oscilacionesOndas() {
+                    <span class="c-type">int</span> op, var;
+                    <span class="c-type">double</span> F, k, x, T, L, f, v, lambda, Ep;
+
+                    <span class="c-keyword">do</span> {
+                        limpiarPantalla();
+                        cout &lt;&lt; <span class="c-string">"--- OSCILACIONES Y ONDAS ---"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"1. Ley de Hooke (F = -k * x) [Magnitud]"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"2. Periodo Pendulo Simple (T = 2pi * sqrt(L/g))"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"3. Relacion Frecuencia-Periodo (f = 1 / T)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"4. Velocidad de Onda (v = lambda * f)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"5. Energia Potencial Elastica (Ep = 0.5 * k * x^2)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"6. Volver"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"Seleccione ecuacion: "</span>;
+                        cin &gt;&gt; op;
+
+                        <span class="c-keyword">if</span> (op == <span class="c-number">6</span>) <span class="c-keyword">return</span>;
+
+                        <span class="c-keyword">switch</span> (op) {
+                            <span class="c-keyword">case</span> <span class="c-number">1</span>: <span class="c-comment">// F = kx (usamos magnitud)</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.Fuerza(N), 2.Constante(N/m), 3.Deformacion(m): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span> (var == <span class="c-number">1</span>) { cout &lt;&lt; <span class="c-string">"k: "</span>; cin &gt;&gt; k; cout &lt;&lt; <span class="c-string">"x: "</span>; cin &gt;&gt; x; cout &lt;&lt; <span class="c-string">"F = "</span> &lt;&lt; k*x &lt;&lt; <span class="c-string">" N"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">2</span>) { cout &lt;&lt; <span class="c-string">"F: "</span>; cin &gt;&gt; F; cout &lt;&lt; <span class="c-string">"x: "</span>; cin &gt;&gt; x; <span class="c-keyword">if</span>(x!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"k = "</span> &lt;&lt; F/x &lt;&lt; <span class="c-string">" N/m"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">3</span>) { cout &lt;&lt; <span class="c-string">"F: "</span>; cin &gt;&gt; F; cout &lt;&lt; <span class="c-string">"k: "</span>; cin &gt;&gt; k; <span class="c-keyword">if</span>(k!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"x = "</span> &lt;&lt; F/k &lt;&lt; <span class="c-string">" m"</span>; }
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">2</span>: <span class="c-comment">// T = 2pi * sqrt(L/g)</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.Periodo(s), 2.Longitud(m): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span> (var == <span class="c-number">1</span>) { cout &lt;&lt; <span class="c-string">"L: "</span>; cin &gt;&gt; L; <span class="c-keyword">if</span>(L&gt;=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"T = "</span> &lt;&lt; <span class="c-number">2</span>*Constantes::PI*sqrt(L/Constantes::g) &lt;&lt; <span class="c-string">" s"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">2</span>) { cout &lt;&lt; <span class="c-string">"T: "</span>; cin &gt;&gt; T; <span class="c-keyword">if</span>(T&gt;=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"L = "</span> &lt;&lt; pow(T/(<span class="c-number">2</span>*Constantes::PI), <span class="c-number">2</span>) * Constantes::g &lt;&lt; <span class="c-string">" m"</span>; }
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">3</span>: <span class="c-comment">// f = 1/T</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.Frecuencia(Hz), 2.Periodo(s): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span> (var == <span class="c-number">1</span>) { cout &lt;&lt; <span class="c-string">"T: "</span>; cin &gt;&gt; T; <span class="c-keyword">if</span>(T!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"f = "</span> &lt;&lt; <span class="c-number">1.0</span>/T &lt;&lt; <span class="c-string">" Hz"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">2</span>) { cout &lt;&lt; <span class="c-string">"f: "</span>; cin &gt;&gt; f; <span class="c-keyword">if</span>(f!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"T = "</span> &lt;&lt; <span class="c-number">1.0</span>/f &lt;&lt; <span class="c-string">" s"</span>; }
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">4</span>: <span class="c-comment">// v = lambda * f</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.Velocidad(m/s), 2.Longitud Onda(m), 3.Frecuencia(Hz): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span> (var == <span class="c-number">1</span>) { cout &lt;&lt; <span class="c-string">"lambda: "</span>; cin &gt;&gt; lambda; cout &lt;&lt; <span class="c-string">"f: "</span>; cin &gt;&gt; f; cout &lt;&lt; <span class="c-string">"v = "</span> &lt;&lt; lambda*f &lt;&lt; <span class="c-string">" m/s"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">2</span>) { cout &lt;&lt; <span class="c-string">"v: "</span>; cin &gt;&gt; v; cout &lt;&lt; <span class="c-string">"f: "</span>; cin &gt;&gt; f; <span class="c-keyword">if</span>(f!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"lambda = "</span> &lt;&lt; v/f &lt;&lt; <span class="c-string">" m"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">3</span>) { cout &lt;&lt; <span class="c-string">"v: "</span>; cin &gt;&gt; v; cout &lt;&lt; <span class="c-string">"lambda: "</span>; cin &gt;&gt; lambda; <span class="c-keyword">if</span>(lambda!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"f = "</span> &lt;&lt; v/lambda &lt;&lt; <span class="c-string">" Hz"</span>; }
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">5</span>: <span class="c-comment">// Ep = 0.5 k x^2</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.Energia(J), 2.Constante(N/m), 3.Deformacion(m): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span> (var == <span class="c-number">1</span>) { cout &lt;&lt; <span class="c-string">"k: "</span>; cin &gt;&gt; k; cout &lt;&lt; <span class="c-string">"x: "</span>; cin &gt;&gt; x; cout &lt;&lt; <span class="c-string">"Ep = "</span> &lt;&lt; <span class="c-number">0.5</span>*k*pow(x,<span class="c-number">2</span>) &lt;&lt; <span class="c-string">" J"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">2</span>) { cout &lt;&lt; <span class="c-string">"Ep: "</span>; cin &gt;&gt; Ep; cout &lt;&lt; <span class="c-string">"x: "</span>; cin &gt;&gt; x; <span class="c-keyword">if</span>(x!=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"k = "</span> &lt;&lt; (<span class="c-number">2</span>*Ep)/pow(x,<span class="c-number">2</span>) &lt;&lt; <span class="c-string">" N/m"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span> (var == <span class="c-number">3</span>) { cout &lt;&lt; <span class="c-string">"Ep: "</span>; cin &gt;&gt; Ep; cout &lt;&lt; <span class="c-string">"k: "</span>; cin &gt;&gt; k; <span class="c-keyword">if</span>(k&gt;<span class="c-number">0</span> &amp;&amp; Ep&gt;=<span class="c-number">0</span>) cout &lt;&lt; <span class="c-string">"x = "</span> &lt;&lt; sqrt((<span class="c-number">2</span>*Ep)/k) &lt;&lt; <span class="c-string">" m"</span>; }
+                                <span class="c-keyword">break</span>;
+                        }
+                        cout &lt;&lt; endl;
+                        pausar();
+                    } <span class="c-keyword">while</span> (op != <span class="c-number">6</span>);
+                }
+
+                <span class="c-comment">// --- MÓDULO 3: ELECTROMAGNETISMO ---</span>
+                <span class="c-type">void</span> electromagnetismo() {
+                    <span class="c-type">int</span> op, var;
+                    <span class="c-type">double</span> V, I, Res, F, q1, q2, r, P, C, Q, E;
+
+                    <span class="c-keyword">do</span> {
+                        limpiarPantalla();
+                        cout &lt;&lt; <span class="c-string">"--- ELECTROMAGNETISMO ---"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"1. Ley de Ohm (V = I * R)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"2. Ley de Coulomb (F = ke * q1 * q2 / r^2)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"3. Potencia Electrica (P = V * I)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"4. Capacitancia (C = Q / V)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"5. Campo Electrico (E = ke * q / r^2)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"6. Volver"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"Seleccione ecuacion: "</span>;
+                        cin &gt;&gt; op;
+
+                        <span class="c-keyword">if</span> (op == <span class="c-number">6</span>) <span class="c-keyword">return</span>;
+
+                        <span class="c-keyword">switch</span>(op) {
+                            <span class="c-keyword">case</span> <span class="c-number">1</span>: <span class="c-comment">// V = I * R</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.Voltaje(V), 2.Corriente(A), 3.Resistencia(Ohm): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span>(var==<span class="c-number">1</span>){ cout&lt;&lt;<span class="c-string">"I: "</span>; cin&gt;&gt;I; cout&lt;&lt;<span class="c-string">"R: "</span>; cin&gt;&gt;Res; cout&lt;&lt;<span class="c-string">"V = "</span>&lt;&lt;I*Res&lt;&lt;<span class="c-string">" V"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span>(var==<span class="c-number">2</span>){ cout&lt;&lt;<span class="c-string">"V: "</span>; cin&gt;&gt;V; cout&lt;&lt;<span class="c-string">"R: "</span>; cin&gt;&gt;Res; <span class="c-keyword">if</span>(Res!=<span class="c-number">0</span>) cout&lt;&lt;<span class="c-string">"I = "</span>&lt;&lt;V/Res&lt;&lt;<span class="c-string">" A"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span>(var==<span class="c-number">3</span>){ cout&lt;&lt;<span class="c-string">"V: "</span>; cin&gt;&gt;V; cout&lt;&lt;<span class="c-string">"I: "</span>; cin&gt;&gt;I; <span class="c-keyword">if</span>(I!=<span class="c-number">0</span>) cout&lt;&lt;<span class="c-string">"R = "</span>&lt;&lt;V/I&lt;&lt;<span class="c-string">" Ohm"</span>; }
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">2</span>: <span class="c-comment">// Coulomb (ke constante)</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.Fuerza(N), 2.Carga1(C), 3.Distancia(m): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span>(var==<span class="c-number">1</span>){ cout&lt;&lt;<span class="c-string">"q1: "</span>; cin&gt;&gt;q1; cout&lt;&lt;<span class="c-string">"q2: "</span>; cin&gt;&gt;q2; cout&lt;&lt;<span class="c-string">"r: "</span>; cin&gt;&gt;r; <span class="c-keyword">if</span>(r!=<span class="c-number">0</span>) cout&lt;&lt;<span class="c-string">"F = "</span>&lt;&lt;(Constantes::k_e*abs(q1*q2))/pow(r,<span class="c-number">2</span>)&lt;&lt;<span class="c-string">" N"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span>(var==<span class="c-number">2</span>){ cout&lt;&lt;<span class="c-string">"F: "</span>; cin&gt;&gt;F; cout&lt;&lt;<span class="c-string">"q2: "</span>; cin&gt;&gt;q2; cout&lt;&lt;<span class="c-string">"r: "</span>; cin&gt;&gt;r; <span class="c-keyword">if</span>(q2!=<span class="c-number">0</span>) cout&lt;&lt;<span class="c-string">"q1 = "</span>&lt;&lt;(F*pow(r,<span class="c-number">2</span>))/(Constantes::k_e*q2)&lt;&lt;<span class="c-string">" C"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span>(var==<span class="c-number">3</span>){ cout&lt;&lt;<span class="c-string">"F: "</span>; cin&gt;&gt;F; cout&lt;&lt;<span class="c-string">"q1: "</span>; cin&gt;&gt;q1; cout&lt;&lt;<span class="c-string">"q2: "</span>; cin&gt;&gt;q2; <span class="c-keyword">if</span>(F!=<span class="c-number">0</span>) cout&lt;&lt;<span class="c-string">"r = "</span>&lt;&lt;sqrt((Constantes::k_e*abs(q1*q2))/F)&lt;&lt;<span class="c-string">" m"</span>; }
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">3</span>: <span class="c-comment">// P = V * I</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.Potencia(W), 2.Voltaje(V), 3.Corriente(A): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span>(var==<span class="c-number">1</span>){ cout&lt;&lt;<span class="c-string">"V: "</span>; cin&gt;&gt;V; cout&lt;&lt;<span class="c-string">"I: "</span>; cin&gt;&gt;I; cout&lt;&lt;<span class="c-string">"P = "</span>&lt;&lt;V*I&lt;&lt;<span class="c-string">" W"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span>(var==<span class="c-number">2</span>){ cout&lt;&lt;<span class="c-string">"P: "</span>; cin&gt;&gt;P; cout&lt;&lt;<span class="c-string">"I: "</span>; cin&gt;&gt;I; <span class="c-keyword">if</span>(I!=<span class="c-number">0</span>) cout&lt;&lt;<span class="c-string">"V = "</span>&lt;&lt;P/I&lt;&lt;<span class="c-string">" V"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span>(var==<span class="c-number">3</span>){ cout&lt;&lt;<span class="c-string">"P: "</span>; cin&gt;&gt;P; cout&lt;&lt;<span class="c-string">"V: "</span>; cin&gt;&gt;V; <span class="c-keyword">if</span>(V!=<span class="c-number">0</span>) cout&lt;&lt;<span class="c-string">"I = "</span>&lt;&lt;P/V&lt;&lt;<span class="c-string">" A"</span>; }
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">4</span>: <span class="c-comment">// C = Q / V</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.Capacitancia(F), 2.Carga(C), 3.Voltaje(V): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span>(var==<span class="c-number">1</span>){ cout&lt;&lt;<span class="c-string">"Q: "</span>; cin&gt;&gt;Q; cout&lt;&lt;<span class="c-string">"V: "</span>; cin&gt;&gt;V; <span class="c-keyword">if</span>(V!=<span class="c-number">0</span>) cout&lt;&lt;<span class="c-string">"C = "</span>&lt;&lt;Q/V&lt;&lt;<span class="c-string">" F"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span>(var==<span class="c-number">2</span>){ cout&lt;&lt;<span class="c-string">"C: "</span>; cin&gt;&gt;C; cout&lt;&lt;<span class="c-string">"V: "</span>; cin&gt;&gt;V; cout&lt;&lt;<span class="c-string">"Q = "</span>&lt;&lt;C*V&lt;&lt;<span class="c-string">" C"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span>(var==<span class="c-number">3</span>){ cout&lt;&lt;<span class="c-string">"Q: "</span>; cin&gt;&gt;Q; cout&lt;&lt;<span class="c-string">"C: "</span>; cin&gt;&gt;C; <span class="c-keyword">if</span>(C!=<span class="c-number">0</span>) cout&lt;&lt;<span class="c-string">"V = "</span>&lt;&lt;Q/C&lt;&lt;<span class="c-string">" V"</span>; }
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">5</span>: <span class="c-comment">// E = ke * q / r^2</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.Campo(N/C), 2.Carga(C), 3.Distancia(m): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span>(var==<span class="c-number">1</span>){ cout&lt;&lt;<span class="c-string">"q: "</span>; cin&gt;&gt;q1; cout&lt;&lt;<span class="c-string">"r: "</span>; cin&gt;&gt;r; <span class="c-keyword">if</span>(r!=<span class="c-number">0</span>) cout&lt;&lt;<span class="c-string">"E = "</span>&lt;&lt;(Constantes::k_e*q1)/pow(r,<span class="c-number">2</span>)&lt;&lt;<span class="c-string">" N/C"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span>(var==<span class="c-number">2</span>){ cout&lt;&lt;<span class="c-string">"E: "</span>; cin&gt;&gt;E; cout&lt;&lt;<span class="c-string">"r: "</span>; cin&gt;&gt;r; cout&lt;&lt;<span class="c-string">"q = "</span>&lt;&lt;(E*pow(r,<span class="c-number">2</span>))/Constantes::k_e&lt;&lt;<span class="c-string">" C"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span>(var==<span class="c-number">3</span>){ cout&lt;&lt;<span class="c-string">"E: "</span>; cin&gt;&gt;E; cout&lt;&lt;<span class="c-string">"q: "</span>; cin&gt;&gt;q1; <span class="c-keyword">if</span>(E!=<span class="c-number">0</span>) cout&lt;&lt;<span class="c-string">"r = "</span>&lt;&lt;sqrt((Constantes::k_e*q1)/E)&lt;&lt;<span class="c-string">" m"</span>; }
+                                <span class="c-keyword">break</span>;
+                        }
+                        cout &lt;&lt; endl;
+                        pausar();
+                    } <span class="c-keyword">while</span>(op != <span class="c-number">6</span>);
+                }
+
+                <span class="c-comment">// --- MÓDULO 4: TERMODINÁMICA ---</span>
+                <span class="c-type">void</span> termodinamica() {
+                    <span class="c-type">int</span> op, var;
+                    <span class="c-type">double</span> P, V, n, T, m, rho, F, A, Q, c, dT;
+
+                    <span class="c-keyword">do</span> {
+                        limpiarPantalla();
+                        cout &lt;&lt; <span class="c-string">"--- TERMODINAMICA ---"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"1. Gases Ideales (P*V = n*R*T)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"2. Densidad (rho = m / V)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"3. Presion (P = F / A)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"4. Calor Especifico (Q = m * c * dT)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"5. Celsius a Kelvin (K = C + 273.15)"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"6. Volver"</span> &lt;&lt; endl;
+                        cout &lt;&lt; <span class="c-string">"Seleccione ecuacion: "</span>;
+                        cin &gt;&gt; op;
+
+                        <span class="c-keyword">if</span>(op == <span class="c-number">6</span>) <span class="c-keyword">return</span>;
+
+                        <span class="c-keyword">switch</span>(op) {
+                            <span class="c-keyword">case</span> <span class="c-number">1</span>: <span class="c-comment">// PV = nRT (R constante)</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.Presion(Pa), 2.Volumen(m3), 3.Moles(n), 4.Temp(K): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span>(var==<span class="c-number">1</span>) { cout&lt;&lt;<span class="c-string">"V: "</span>; cin&gt;&gt;V; cout&lt;&lt;<span class="c-string">"n: "</span>; cin&gt;&gt;n; cout&lt;&lt;<span class="c-string">"T: "</span>; cin&gt;&gt;T; <span class="c-keyword">if</span>(V!=<span class="c-number">0</span>) cout&lt;&lt;<span class="c-string">"P = "</span>&lt;&lt;(n*Constantes::R*T)/V&lt;&lt;<span class="c-string">" Pa"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span>(var==<span class="c-number">2</span>) { cout&lt;&lt;<span class="c-string">"P: "</span>; cin&gt;&gt;P; cout&lt;&lt;<span class="c-string">"n: "</span>; cin&gt;&gt;n; cout&lt;&lt;<span class="c-string">"T: "</span>; cin&gt;&gt;T; <span class="c-keyword">if</span>(P!=<span class="c-number">0</span>) cout&lt;&lt;<span class="c-string">"V = "</span>&lt;&lt;(n*Constantes::R*T)/P&lt;&lt;<span class="c-string">" m3"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span>(var==<span class="c-number">3</span>) { cout&lt;&lt;<span class="c-string">"P: "</span>; cin&gt;&gt;P; cout&lt;&lt;<span class="c-string">"V: "</span>; cin&gt;&gt;V; cout&lt;&lt;<span class="c-string">"T: "</span>; cin&gt;&gt;T; <span class="c-keyword">if</span>(T!=<span class="c-number">0</span>) cout&lt;&lt;<span class="c-string">"n = "</span>&lt;&lt;(P*V)/(Constantes::R*T)&lt;&lt;<span class="c-string">" mol"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span>(var==<span class="c-number">4</span>) { cout&lt;&lt;<span class="c-string">"P: "</span>; cin&gt;&gt;P; cout&lt;&lt;<span class="c-string">"V: "</span>; cin&gt;&gt;V; cout&lt;&lt;<span class="c-string">"n: "</span>; cin&gt;&gt;n; <span class="c-keyword">if</span>(n!=<span class="c-number">0</span>) cout&lt;&lt;<span class="c-string">"T = "</span>&lt;&lt;(P*V)/(n*Constantes::R)&lt;&lt;<span class="c-string">" K"</span>; }
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">2</span>: <span class="c-comment">// rho = m / V</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.Densidad(kg/m3), 2.Masa(kg), 3.Volumen(m3): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span>(var==<span class="c-number">1</span>) { cout&lt;&lt;<span class="c-string">"m: "</span>; cin&gt;&gt;m; cout&lt;&lt;<span class="c-string">"V: "</span>; cin&gt;&gt;V; <span class="c-keyword">if</span>(V!=<span class="c-number">0</span>) cout&lt;&lt;<span class="c-string">"Densidad = "</span>&lt;&lt;m/V&lt;&lt;<span class="c-string">" kg/m3"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span>(var==<span class="c-number">2</span>) { cout&lt;&lt;<span class="c-string">"Densidad: "</span>; cin&gt;&gt;rho; cout&lt;&lt;<span class="c-string">"V: "</span>; cin&gt;&gt;V; cout&lt;&lt;<span class="c-string">"Masa = "</span>&lt;&lt;rho*V&lt;&lt;<span class="c-string">" kg"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span>(var==<span class="c-number">3</span>) { cout&lt;&lt;<span class="c-string">"Densidad: "</span>; cin&gt;&gt;rho; cout&lt;&lt;<span class="c-string">"m: "</span>; cin&gt;&gt;m; <span class="c-keyword">if</span>(rho!=<span class="c-number">0</span>) cout&lt;&lt;<span class="c-string">"Volumen = "</span>&lt;&lt;m/rho&lt;&lt;<span class="c-string">" m3"</span>; }
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">3</span>: <span class="c-comment">// P = F / A</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.Presion(Pa), 2.Fuerza(N), 3.Area(m2): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span>(var==<span class="c-number">1</span>) { cout&lt;&lt;<span class="c-string">"F: "</span>; cin&gt;&gt;F; cout&lt;&lt;<span class="c-string">"A: "</span>; cin&gt;&gt;A; <span class="c-keyword">if</span>(A!=<span class="c-number">0</span>) cout&lt;&lt;<span class="c-string">"P = "</span>&lt;&lt;F/A&lt;&lt;<span class="c-string">" Pa"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span>(var==<span class="c-number">2</span>) { cout&lt;&lt;<span class="c-string">"P: "</span>; cin&gt;&gt;P; cout&lt;&lt;<span class="c-string">"A: "</span>; cin&gt;&gt;A; cout&lt;&lt;<span class="c-string">"F = "</span>&lt;&lt;P*A&lt;&lt;<span class="c-string">" N"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span>(var==<span class="c-number">3</span>) { cout&lt;&lt;<span class="c-string">"P: "</span>; cin&gt;&gt;P; cout&lt;&lt;<span class="c-string">"F: "</span>; cin&gt;&gt;F; <span class="c-keyword">if</span>(P!=<span class="c-number">0</span>) cout&lt;&lt;<span class="c-string">"A = "</span>&lt;&lt;F/P&lt;&lt;<span class="c-string">" m2"</span>; }
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">4</span>: <span class="c-comment">// Q = m * c * dT</span>
+                                cout &lt;&lt; <span class="c-string">"Despejar: 1.Calor(J), 2.Masa(kg), 3.Calor Esp(J/kgK), 4.Delta T(K): "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span>(var==<span class="c-number">1</span>) { cout&lt;&lt;<span class="c-string">"m: "</span>; cin&gt;&gt;m; cout&lt;&lt;<span class="c-string">"c: "</span>; cin&gt;&gt;c; cout&lt;&lt;<span class="c-string">"dT: "</span>; cin&gt;&gt;dT; cout&lt;&lt;<span class="c-string">"Q = "</span>&lt;&lt;m*c*dT&lt;&lt;<span class="c-string">" J"</span>; }
+                                <span class="c-keyword">else</span> <span class="c-keyword">if</span>(var==<span class="c-number">2</span>) { cout&lt;&lt;<span class="c-string">"Q: "</span>; cin&gt;&gt;Q; cout&lt;&lt;<span class="c-string">"c: "</span>; cin&gt;&gt;c; cout&lt;&lt;<span class="c-string">"dT: "</span>; cin&gt;&gt;dT; <span class="c-keyword">if</span>(c*dT!=<span class="c-number">0</span>) cout&lt;&lt;<span class="c-string">"m = "</span>&lt;&lt;Q/(c*dT)&lt;&lt;<span class="c-string">" kg"</span>; }
+                                <span class="c-keyword">break</span>;
+                            <span class="c-keyword">case</span> <span class="c-number">5</span>: <span class="c-comment">// K = C + 273.15</span>
+                                cout &lt;&lt; <span class="c-string">"1. Celsius a Kelvin, 2. Kelvin a Celsius: "</span>; cin &gt;&gt; var;
+                                <span class="c-keyword">if</span>(var==<span class="c-number">1</span>) { cout&lt;&lt;<span class="c-string">"C: "</span>; cin&gt;&gt;T; cout&lt;&lt;<span class="c-string">"K = "</span>&lt;&lt;T + <span class="c-number">273.15</span>; }
+                                <span class="c-keyword">else</span> { cout&lt;&lt;<span class="c-string">"K: "</span>; cin&gt;&gt;T; cout&lt;&lt;<span class="c-string">"C = "</span>&lt;&lt;T - <span class="c-number">273.15</span>; }
+                                <span class="c-keyword">break</span>;
+                        }
+                        cout &lt;&lt; endl;
+                        pausar();
+                    } <span class="c-keyword">while</span>(op != <span class="c-number">6</span>);
+                }
+
+                  <span class="c-comment">// --- MÓDULO 5: CONVERSIONES INTEGRAL ---</span>
+                    <span class="c-type">void</span> tablaConversiones() {
+                        <span class="c-type">int</span> cat, op; 
+                        <span class="c-type">double</span> val;
+
+                        <span class="c-keyword">do</span> {
+                            limpiarPantalla();
+                            cout &lt;&lt; <span class="c-string">"--- CONVERTIDOR DE UNIDADES UNIVERSAL ---"</span> &lt;&lt; endl;
+                            cout &lt;&lt; <span class="c-string">"Seleccione la magnitud a convertir:"</span> &lt;&lt; endl;
+                            cout &lt;&lt; <span class="c-string">"1.  Longitud (Metros, Pies, Pulgadas, Millas)"</span> &lt;&lt; endl;
+                            cout &lt;&lt; <span class="c-string">"2.  Masa (Kilogramos, Libras, Onzas)"</span> &lt;&lt; endl;
+                            cout &lt;&lt; <span class="c-string">"3.  Velocidad (m/s, km/h, mph)"</span> &lt;&lt; endl;
+                            cout &lt;&lt; <span class="c-string">"4.  Fuerza (Newtons, Libras-fuerza)"</span> &lt;&lt; endl;
+                            cout &lt;&lt; <span class="c-string">"5.  Energia y Trabajo (Joules, Calorias, BTU)"</span> &lt;&lt; endl;
+                            cout &lt;&lt; <span class="c-string">"6.  Potencia (Watts, Caballos de fuerza HP)"</span> &lt;&lt; endl;
+                            cout &lt;&lt; <span class="c-string">"7.  Presion (Pascales, ATM, PSI, mmHg)"</span> &lt;&lt; endl;
+                            cout &lt;&lt; <span class="c-string">"8.  Temperatura (Celsius, Fahrenheit, Kelvin)"</span> &lt;&lt; endl;
+                            cout &lt;&lt; <span class="c-string">"9.  Volumen (Litros, Galones, m3)"</span> &lt;&lt; endl;
+                            cout &lt;&lt; <span class="c-string">"10. Angulos (Grados, Radianes)"</span> &lt;&lt; endl;
+                            cout &lt;&lt; <span class="c-string">"11. Volver al Menu Principal"</span> &lt;&lt; endl;
+                            cout &lt;&lt; <span class="c-string">"Seleccione: "</span>;
+                            cin &gt;&gt; cat;
+
+                            <span class="c-keyword">if</span> (cat == <span class="c-number">11</span>) <span class="c-keyword">return</span>;
+
+                            limpiarPantalla();
+                            <span class="c-keyword">switch</span> (cat) {
+                                <span class="c-keyword">case</span> <span class="c-number">1</span>: <span class="c-comment">// Longitud</span>
+                                    cout &lt;&lt; <span class="c-string">"--- LONGITUD ---"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"1. Metros a Pies (ft)"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"2. Pies a Metros"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"3. Metros a Pulgadas (in)"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"4. Kilometros a Millas"</span> &lt;&lt; endl;
+                                    cin &gt;&gt; op;
+                                    cout &lt;&lt; <span class="c-string">"Ingrese valor: "</span>; cin &gt;&gt; val;
+                                    <span class="c-keyword">if</span>(op==<span class="c-number">1</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" m = "</span> &lt;&lt; val * <span class="c-number">3.28084</span> &lt;&lt; <span class="c-string">" ft"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">2</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" ft = "</span> &lt;&lt; val / <span class="c-number">3.28084</span> &lt;&lt; <span class="c-string">" m"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">3</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" m = "</span> &lt;&lt; val * <span class="c-number">39.3701</span> &lt;&lt; <span class="c-string">" in"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">4</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" km = "</span> &lt;&lt; val * <span class="c-number">0.621371</span> &lt;&lt; <span class="c-string">" mi"</span>;
+                                    <span class="c-keyword">break</span>;
+
+                                <span class="c-keyword">case</span> <span class="c-number">2</span>: <span class="c-comment">// Masa</span>
+                                    cout &lt;&lt; <span class="c-string">"--- MASA ---"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"1. Kilogramos a Libras (lb)"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"2. Libras a Kilogramos"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"3. Kilogramos a Onzas (oz)"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"4. Gramos a Onzas"</span> &lt;&lt; endl;
+                                    cin &gt;&gt; op;
+                                    cout &lt;&lt; <span class="c-string">"Ingrese valor: "</span>; cin &gt;&gt; val;
+                                    <span class="c-keyword">if</span>(op==<span class="c-number">1</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" kg = "</span> &lt;&lt; val * <span class="c-number">2.20462</span> &lt;&lt; <span class="c-string">" lb"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">2</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" lb = "</span> &lt;&lt; val / <span class="c-number">2.20462</span> &lt;&lt; <span class="c-string">" kg"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">3</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" kg = "</span> &lt;&lt; val * <span class="c-number">35.274</span> &lt;&lt; <span class="c-string">" oz"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">4</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" g = "</span> &lt;&lt; val * <span class="c-number">0.035274</span> &lt;&lt; <span class="c-string">" oz"</span>;
+                                    <span class="c-keyword">break</span>;
+
+                                <span class="c-keyword">case</span> <span class="c-number">3</span>: <span class="c-comment">// Velocidad</span>
+                                    cout &lt;&lt; <span class="c-string">"--- VELOCIDAD ---"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"1. m/s a km/h"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"2. km/h a m/s"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"3. m/s a Millas por hora (mph)"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"4. km/h a Millas por hora (mph)"</span> &lt;&lt; endl;
+                                    cin &gt;&gt; op;
+                                    cout &lt;&lt; <span class="c-string">"Ingrese valor: "</span>; cin &gt;&gt; val;
+                                    <span class="c-keyword">if</span>(op==<span class="c-number">1</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" m/s = "</span> &lt;&lt; val * <span class="c-number">3.6</span> &lt;&lt; <span class="c-string">" km/h"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">2</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" km/h = "</span> &lt;&lt; val / <span class="c-number">3.6</span> &lt;&lt; <span class="c-string">" m/s"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">3</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" m/s = "</span> &lt;&lt; val * <span class="c-number">2.23694</span> &lt;&lt; <span class="c-string">" mph"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">4</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" km/h = "</span> &lt;&lt; val * <span class="c-number">0.621371</span> &lt;&lt; <span class="c-string">" mph"</span>;
+                                    <span class="c-keyword">break</span>;
+
+                                <span class="c-keyword">case</span> <span class="c-number">4</span>: <span class="c-comment">// Fuerza</span>
+                                    cout &lt;&lt; <span class="c-string">"--- FUERZA ---"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"1. Newtons a Libras-fuerza (lbf)"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"2. Libras-fuerza a Newtons"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"3. Newtons a Dinas"</span> &lt;&lt; endl;
+                                    cin &gt;&gt; op;
+                                    cout &lt;&lt; <span class="c-string">"Ingrese valor: "</span>; cin &gt;&gt; val;
+                                    <span class="c-keyword">if</span>(op==<span class="c-number">1</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" N = "</span> &lt;&lt; val * <span class="c-number">0.224809</span> &lt;&lt; <span class="c-string">" lbf"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">2</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" lbf = "</span> &lt;&lt; val / <span class="c-number">0.224809</span> &lt;&lt; <span class="c-string">" N"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">3</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" N = "</span> &lt;&lt; val * <span class="c-number">100000</span> &lt;&lt; <span class="c-string">" dinas"</span>;
+                                    <span class="c-keyword">break</span>;
+
+                                <span class="c-keyword">case</span> <span class="c-number">5</span>: <span class="c-comment">// Energía</span>
+                                    cout &lt;&lt; <span class="c-string">"--- ENERGIA ---"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"1. Joules a Calorias (cal)"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"2. Calorias a Joules"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"3. Joules a BTU"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"4. Joules a kW-hora (kWh)"</span> &lt;&lt; endl;
+                                    cin &gt;&gt; op;
+                                    cout &lt;&lt; <span class="c-string">"Ingrese valor: "</span>; cin &gt;&gt; val;
+                                    <span class="c-keyword">if</span>(op==<span class="c-number">1</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" J = "</span> &lt;&lt; val * <span class="c-number">0.239006</span> &lt;&lt; <span class="c-string">" cal"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">2</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" cal = "</span> &lt;&lt; val / <span class="c-number">0.239006</span> &lt;&lt; <span class="c-string">" J"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">3</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" J = "</span> &lt;&lt; val * <span class="c-number">0.000947817</span> &lt;&lt; <span class="c-string">" BTU"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">4</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" J = "</span> &lt;&lt; val / <span class="c-number">3.6e6</span> &lt;&lt; <span class="c-string">" kWh"</span>;
+                                    <span class="c-keyword">break</span>;
+
+                                <span class="c-keyword">case</span> <span class="c-number">6</span>: <span class="c-comment">// Potencia</span>
+                                    cout &lt;&lt; <span class="c-string">"--- POTENCIA ---"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"1. Watts a Caballos de Fuerza (HP - Mecanico)"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"2. Caballos de Fuerza (HP) a Watts"</span> &lt;&lt; endl;
+                                    cin &gt;&gt; op;
+                                    cout &lt;&lt; <span class="c-string">"Ingrese valor: "</span>; cin &gt;&gt; val;
+                                    <span class="c-keyword">if</span>(op==<span class="c-number">1</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" W = "</span> &lt;&lt; val * <span class="c-number">0.00134102</span> &lt;&lt; <span class="c-string">" HP"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">2</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" HP = "</span> &lt;&lt; val / <span class="c-number">0.00134102</span> &lt;&lt; <span class="c-string">" W"</span>;
+                                    <span class="c-keyword">break</span>;
+
+                                <span class="c-keyword">case</span> <span class="c-number">7</span>: <span class="c-comment">// Presión</span>
+                                    cout &lt;&lt; <span class="c-string">"--- PRESION ---"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"1. Pascales a Atmosferas (atm)"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"2. Atmosferas a Pascales"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"3. Pascales a PSI (lb/in^2)"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"4. Atmosferas a mmHg"</span> &lt;&lt; endl;
+                                    cin &gt;&gt; op;
+                                    cout &lt;&lt; <span class="c-string">"Ingrese valor: "</span>; cin &gt;&gt; val;
+                                    <span class="c-keyword">if</span>(op==<span class="c-number">1</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" Pa = "</span> &lt;&lt; val / <span class="c-number">101325.0</span> &lt;&lt; <span class="c-string">" atm"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">2</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" atm = "</span> &lt;&lt; val * <span class="c-number">101325.0</span> &lt;&lt; <span class="c-string">" Pa"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">3</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" Pa = "</span> &lt;&lt; val * <span class="c-number">0.000145038</span> &lt;&lt; <span class="c-string">" PSI"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">4</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" atm = "</span> &lt;&lt; val * <span class="c-number">760.0</span> &lt;&lt; <span class="c-string">" mmHg"</span>;
+                                    <span class="c-keyword">break</span>;
+
+                                <span class="c-keyword">case</span> <span class="c-number">8</span>: <span class="c-comment">// Temperatura</span>
+                                    cout &lt;&lt; <span class="c-string">"--- TEMPERATURA ---"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"1. Celsius a Fahrenheit"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"2. Fahrenheit a Celsius"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"3. Celsius a Kelvin"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"4. Kelvin a Celsius"</span> &lt;&lt; endl;
+                                    cin &gt;&gt; op;
+                                    cout &lt;&lt; <span class="c-string">"Ingrese valor: "</span>; cin &gt;&gt; val;
+                                    <span class="c-keyword">if</span>(op==<span class="c-number">1</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" C = "</span> &lt;&lt; (val * <span class="c-number">9.0</span>/<span class="c-number">5.0</span>) + <span class="c-number">32.0</span> &lt;&lt; <span class="c-string">" F"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">2</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" F = "</span> &lt;&lt; (val - <span class="c-number">32.0</span>) * <span class="c-number">5.0</span>/<span class="c-number">9.0</span> &lt;&lt; <span class="c-string">" C"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">3</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" C = "</span> &lt;&lt; val + <span class="c-number">273.15</span> &lt;&lt; <span class="c-string">" K"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">4</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" K = "</span> &lt;&lt; val - <span class="c-number">273.15</span> &lt;&lt; <span class="c-string">" C"</span>;
+                                    <span class="c-keyword">break</span>;
+
+                                <span class="c-keyword">case</span> <span class="c-number">9</span>: <span class="c-comment">// Volumen</span>
+                                    cout &lt;&lt; <span class="c-string">"--- VOLUMEN ---"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"1. Litros a Galones (US)"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"2. Galones (US) a Litros"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"3. Metros cubicos a Litros"</span> &lt;&lt; endl;
+                                    cin &gt;&gt; op;
+                                    cout &lt;&lt; <span class="c-string">"Ingrese valor: "</span>; cin &gt;&gt; val;
+                                    <span class="c-keyword">if</span>(op==<span class="c-number">1</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" L = "</span> &lt;&lt; val * <span class="c-number">0.264172</span> &lt;&lt; <span class="c-string">" gal"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">2</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" gal = "</span> &lt;&lt; val / <span class="c-number">0.264172</span> &lt;&lt; <span class="c-string">" L"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">3</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" m3 = "</span> &lt;&lt; val * <span class="c-number">1000.0</span> &lt;&lt; <span class="c-string">" L"</span>;
+                                    <span class="c-keyword">break</span>;
+
+                                <span class="c-keyword">case</span> <span class="c-number">10</span>: <span class="c-comment">// Ángulos</span>
+                                    cout &lt;&lt; <span class="c-string">"--- ANGULOS ---"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"1. Grados a Radianes"</span> &lt;&lt; endl;
+                                    cout &lt;&lt; <span class="c-string">"2. Radianes a Grados"</span> &lt;&lt; endl;
+                                    cin &gt;&gt; op;
+                                    cout &lt;&lt; <span class="c-string">"Ingrese valor: "</span>; cin &gt;&gt; val;
+                                    <span class="c-keyword">if</span>(op==<span class="c-number">1</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" deg = "</span> &lt;&lt; val * (Constantes::PI / <span class="c-number">180.0</span>) &lt;&lt; <span class="c-string">" rad"</span>;
+                                    <span class="c-keyword">else</span> <span class="c-keyword">if</span>(op==<span class="c-number">2</span>) cout &lt;&lt; val &lt;&lt; <span class="c-string">" rad = "</span> &lt;&lt; val * (<span class="c-number">180.0</span> / Constantes::PI) &lt;&lt; <span class="c-string">" deg"</span>;
+                                    <span class="c-keyword">break</span>;
+                                    
+                                <span class="c-keyword">default</span>:
+                                    cout &lt;&lt; <span class="c-string">"Opcion no valida."</span> &lt;&lt; endl;
+                            }
+                            cout &lt;&lt; endl;
+                            pausar();
+                        } <span class="c-keyword">while</span> (cat != <span class="c-number">11</span>);
+                    }
+              </code>
+            </pre>
+          </div>
+        </div>
+      </details>
+    </section>
+
+  </main>
+
+  <footer id="about" class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-info">
+        <div class="footer-name">Jhostin Ofiel Noh Garma</div>
+        <div class="footer-detail">Temas Selectos de Física Aplicada · 2025</div>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/tu-usuario" class="footer-link">GitHub</a>
+        <a href="mailto:tu@email.com" class="footer-link">Contacto</a>
+      </div>
+      <div class="footer-note">HTML · CSS · JS · GitHub Pages</div>
+    </div>
+  </footer>
+
+  <script src="js/led-simulator.js"></script>
+  <script src="js/calculator.js"></script>
+</body>
+</html>

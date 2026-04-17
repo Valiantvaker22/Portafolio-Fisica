@@ -1,0 +1,956 @@
+/* ════════════════════════════════════════════════════
+   PORTAFOLIO FÍSICA APLICADA — style.css
+   Tema: Industrial / Técnico · Solo HTML + CSS
+════════════════════════════════════════════════════ */
+
+/* ── Variables globales ── */
+:root {
+  --bg:          #0d0f12;
+  --bg-card:     #13161b;
+  --bg-code:     #0a0c0f;
+  --bg-terminal: #0e1117;
+
+  --border:      #252932;
+  --border-dim:  #1c1f27;
+
+  --text-primary:  #e8eaf0;
+  --text-secondary:#8b9098;
+  --text-dim:      #4a5060;
+
+  --accent:      #f0c060;      /* ámbar / ámbar dorado */
+  --accent-dim:  #7a5f20;
+  --cpp-accent:  #60b8f0;      /* azul para C++ */
+  --cpp-dim:     #1e4a7a;
+  --green:       #5ad08a;
+  --red:         #e06060;
+
+  /* Tipografía */
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-mono:    'JetBrains Mono', 'Space Mono', monospace;
+  --font-ui:      'Space Mono', monospace;
+
+  /* Tamaños */
+  --radius:   4px;
+  --gap:      2rem;
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ════════════════════════════
+   HEADER / HERO
+════════════════════════════ */
+.site-header {
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem 3rem;
+}
+
+.header-grid {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--border-dim);
+  margin-bottom: 4rem;
+}
+
+.header-label,
+.header-year {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.header-nav {
+  display: flex;
+  gap: 2rem;
+}
+
+.header-nav a {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  transition: color 0.2s;
+}
+.header-nav a:hover { color: var(--accent); }
+
+/* Hero */
+.hero {
+  max-width: 860px;
+}
+
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 8vw, 7rem);
+  line-height: 1.0;
+  color: var(--text-primary);
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.hero-sub {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+  margin-bottom: 2rem;
+}
+
+.hero-rule {
+  width: 4rem;
+  height: 2px;
+  background: var(--accent);
+}
+
+/* ════════════════════════════
+   PROYECTOS — Layout general
+════════════════════════════ */
+main { max-width: 980px; margin: 0 auto; padding: 0 2rem; }
+
+.project {
+  padding: 4rem 0;
+}
+
+.project-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.project-number {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+}
+
+.project-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 2px;
+  border: 1px solid;
+}
+
+.project--arduino .project-tag {
+  color: var(--accent);
+  border-color: var(--accent-dim);
+  background: rgba(240, 192, 96, 0.06);
+}
+
+.project--cpp .project-tag {
+  color: var(--cpp-accent);
+  border-color: var(--cpp-dim);
+  background: rgba(96, 184, 240, 0.06);
+}
+
+.project-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  margin-bottom: 3rem;
+  align-items: start;
+}
+
+.project-header h2 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.project--cpp .project-header h2 { color: var(--cpp-accent); }
+.project--arduino .project-header h2 { color: var(--accent); }
+
+.project-desc {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  padding-top: 0.5rem;
+}
+
+/* ════════════════════════════
+   DIAGRAMA DE COMPONENTES
+════════════════════════════ */
+.component-diagram {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 2.5rem;
+  overflow: hidden;
+}
+
+.diagram-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--border-dim);
+  background: var(--bg);
+}
+
+.diagram-body {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  flex-wrap: wrap;
+}
+
+.component-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  min-width: 140px;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.component-box:hover { border-color: var(--accent-dim); }
+
+.comp-arduino { border-color: var(--accent-dim); }
+
+.comp-icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
+.led-green { color: var(--green); }
+
+.comp-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.comp-detail, .comp-pins {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.comp-pins { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; margin-top: 0.5rem; }
+
+.pin {
+  padding: 2px 6px;
+  border-radius: 2px;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+.pin-digital { background: rgba(240,192,96,0.15); color: var(--accent); }
+.pin-i2c     { background: rgba(90,208,138,0.15); color: var(--green); }
+
+.diagram-wires {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.wire--data { color: var(--accent); }
+.wire--i2c  { color: var(--green); }
+
+.component-col { display: flex; flex-direction: column; gap: 0.75rem; }
+
+/* ════════════════════════════
+   IMAGEN DE CIRCUITO
+════════════════════════════ */
+.diagram-circuit-img {
+  padding: 1.5rem;
+  background: #f0f2f5;
+  text-align: center;
+}
+
+.diagram-circuit-img img {
+  max-width: 100%;
+  max-height: 480px;
+  border-radius: var(--radius);
+  object-fit: contain;
+}
+
+/* ════════════════════════════
+   MAPA DE COLORES
+════════════════════════════ */
+.color-map-wrapper {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+}
+
+.color-map-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--border-dim);
+  background: var(--bg-card);
+}
+
+.color-map {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--bg-card);
+}
+
+.color-zone {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  border-right: 1px solid var(--border-dim);
+}
+.color-zone:last-child { border-right: none; }
+
+.zone-swatch {
+  height: 36px;
+  border-radius: 3px;
+  margin-bottom: 0.75rem;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.zone-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 0.25rem;
+}
+
+.zone-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.zone-desc {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+}
+
+@media (max-width: 680px) {
+  .color-map { grid-template-columns: repeat(2, 1fr); }
+  .color-zone { border-bottom: 1px solid var(--border-dim); }
+}
+
+/* ════════════════════════════
+   BLOQUE DE CÓDIGO
+════════════════════════════ */
+.code-block-wrapper {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+}
+
+.code-block-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.65rem 1rem;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+}
+
+.code-dots { display: flex; gap: 6px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; }
+.dot--red    { background: #e06060; }
+.dot--yellow { background: #e0b860; }
+.dot--green  { background: #5ad08a; }
+
+.code-filename {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-primary);
+  flex: 1;
+  text-align: center;
+}
+
+.code-lang {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.code-block {
+  background: var(--bg-code);
+  overflow-x: auto;
+}
+
+.code-block pre {
+  padding: 1.5rem 1.75rem;
+  margin: 0;
+  overflow-x: auto;
+}
+
+.code-block code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.85;
+  display: block;
+}
+
+/* Syntax highlighting — solo CSS */
+.c-comment  { color: #4a5568; font-style: italic; }
+.c-include  { color: #e06898; }
+.c-string   { color: #5ad08a; }
+.c-keyword  { color: #c792ea; }
+.c-macro    { color: #f0c060; }
+.c-number   { color: #60b8f0; }
+.c-type     { color: #82aaff; }
+.c-func     { color: #89ddff; }
+
+/* ════════════════════════════
+   TABLA DE ESPECIFICACIONES
+════════════════════════════ */
+.specs-table-wrapper {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.specs-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--border-dim);
+  background: var(--bg-card);
+}
+
+.specs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+.specs-table th {
+  background: var(--bg-card);
+  color: var(--text-dim);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.specs-table td {
+  padding: 0.6rem 1rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-dim);
+}
+
+.specs-table tr:last-child td { border-bottom: none; }
+
+.specs-table tr:hover td {
+  background: rgba(255,255,255,0.02);
+  color: var(--text-primary);
+}
+
+.specs-table td:last-child {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ════════════════════════════
+   TERMINAL FALSA (solo CSS)
+════════════════════════════ */
+.terminal-wrapper {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.terminal-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.65rem 1rem;
+  background: #1a1d24;
+  border-bottom: 1px solid var(--border);
+}
+
+.terminal-dots { display: flex; gap: 6px; }
+
+.terminal-title {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  flex: 1;
+  text-align: center;
+}
+
+.terminal-body {
+  background: var(--bg-terminal);
+  padding: 1.5rem 1.75rem;
+  min-height: 400px;
+}
+
+.terminal-line {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.7;
+  white-space: pre;
+}
+
+.t-blank { height: 0.5em; }
+
+/* Elementos del prompt */
+.t-prompt { color: var(--green); }
+.t-sep    { color: var(--text-dim); }
+.t-path   { color: var(--cpp-accent); }
+.t-dollar { color: var(--text-secondary); }
+.t-cmd    { color: var(--text-primary); }
+
+/* Elementos del programa */
+.t-banner      { color: var(--cpp-accent); opacity: 0.8; }
+.t-header      { color: var(--text-dim); letter-spacing: 0.04em; }
+.t-option      { color: var(--text-secondary); }
+.t-option:hover{ color: var(--text-primary); }
+.t-dim         { color: var(--text-dim); }
+
+/* Inputs y resultados */
+.t-label       { color: var(--text-secondary); }
+.t-input       { color: var(--accent); font-weight: 700; }
+
+.t-result-header { color: var(--cpp-dim); }
+.t-result        { color: var(--text-secondary); }
+.t-result-value  { color: var(--green); font-weight: 700; font-size: 14px; }
+
+/* Cursor parpadeante — solo CSS */
+.t-cursor {
+  display: inline-block;
+  color: var(--text-primary);
+  animation: blink 1.2s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ════════════════════════════
+   DIVISOR DE SECCIÓN
+════════════════════════════ */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.divider-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* ════════════════════════════
+   FOOTER
+════════════════════════════ */
+.site-footer {
+  border-top: 1px solid var(--border);
+  margin-top: 4rem;
+}
+
+.footer-inner {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer-name {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.footer-detail {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+}
+
+.footer-links { display: flex; gap: 1.5rem; }
+
+.footer-link {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  transition: color 0.2s;
+}
+.footer-link:hover { color: var(--accent); }
+
+.footer-note {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+}
+
+/* ════════════════════════════
+   RESPONSIVE
+════════════════════════════ */
+@media (max-width: 680px) {
+  .project-header {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .header-nav { display: none; }
+  .diagram-body { flex-direction: column; align-items: flex-start; }
+  .footer-inner { flex-direction: column; text-align: center; }
+  .diagram-wires { flex-direction: row; }
+}
+
+/* ════════════════════════════
+   LED SIMULATOR
+════════════════════════════ */
+.led-simulator-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--border-dim);
+  background: var(--bg-card);
+}
+
+.card-header-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
+}
+
+.led-simulator-body {
+  background: var(--bg-card);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.led-strip-container {
+  background: #080a0d;
+  border: 1px solid var(--border-dim);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+}
+
+.led-strip {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.led-bulb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #111;
+  transition: background 0.35s ease, box-shadow 0.35s ease;
+  flex-shrink: 0;
+}
+
+/* Controls */
+.simulator-controls { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.temp-display-row {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.temp-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+}
+
+.temp-value {
+  font-family: var(--font-mono);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  transition: color 0.3s;
+  min-width: 4rem;
+}
+
+.temp-color-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  transition: color 0.3s;
+}
+
+/* Slider */
+.temp-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  outline: none;
+  cursor: pointer;
+}
+.temp-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--accent);
+  transition: box-shadow 0.2s;
+}
+.temp-slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 14px var(--accent);
+}
+.temp-slider::-moz-range-thumb {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: none;
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+/* Barra de zonas de color */
+.color-zones-bar {
+  display: flex;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.cz { flex: 1; }
+.cz-cold   { background: #0000ff; }
+.cz-trans1 { background: linear-gradient(to right, #0000ff, #00ff00); }
+.cz-trans2 { background: linear-gradient(to right, #00ff00, #ff0000); }
+.cz-hot    { background: #ff0000; }
+
+.formula-display {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--cpp-accent);
+  background: var(--bg-code);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.9rem;
+  letter-spacing: 0.04em;
+  min-height: 2rem;
+  transition: all 0.3s;
+}
+
+/* ════════════════════════════
+   TERMINAL INTERACTIVA (JS)
+════════════════════════════ */
+.terminal-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--green);
+  border: 1px solid var(--green);
+  padding: 2px 7px;
+  border-radius: 2px;
+  opacity: 0.8;
+}
+
+.terminal-body {
+  background: var(--bg-terminal);
+  padding: 1.25rem 1.5rem;
+  min-height: 340px;
+  max-height: 480px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+/* Scrollbar de la terminal */
+.terminal-body::-webkit-scrollbar { width: 4px; }
+.terminal-body::-webkit-scrollbar-track { background: transparent; }
+.terminal-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Clases de línea usadas por el JS */
+.t-banner      { color: var(--cpp-accent); }
+.t-border      { color: var(--border); }
+.t-header      { color: var(--text-dim); letter-spacing: 0.04em; }
+.t-option      { color: var(--text-secondary); }
+.t-dim         { color: var(--text-dim); }
+.t-label       { color: var(--text-secondary); }
+.t-input       { color: var(--accent); font-weight: 700; }
+.t-result-header { color: var(--cpp-dim); }
+.t-result      { color: var(--text-secondary); }
+.t-result-value { color: var(--green); font-weight: 700; font-size: 14px; }
+.t-error       { color: var(--red); }
+
+/* Fila de input al pie */
+.terminal-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1.5rem;
+  background: #0b0d11;
+  border-top: 1px solid var(--border);
+}
+
+.t-prompt-inline {
+  color: var(--green);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.terminal-input-field {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent);
+  caret-color: var(--accent);
+}
+
+.terminal-input-field::placeholder {
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* ════════════════════════════
+   CÓDIGO COLAPSABLE (details)
+════════════════════════════ */
+.code-details {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+
+.code-details-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1.25rem;
+  background: var(--bg-card);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  transition: color 0.2s;
+}
+.code-details-summary::-webkit-details-marker { display: none; }
+.code-details-summary:hover { color: var(--text-primary); }
+
+.summary-arrow {
+  transition: transform 0.2s;
+  color: var(--text-dim);
+}
+details[open] .summary-arrow { transform: rotate(90deg); }
+
+.code-details-inner {
+  border: none;
+  border-radius: 0;
+  margin: 0;
+}
+
+/* Ajuste para imagen de circuito */
+.diagram-circuit-img {
+  padding: 1.5rem;
+  background: #f0f2f5;
+  text-align: center;
+}
+.diagram-circuit-img img {
+  max-width: 100%;
+  max-height: 480px;
+  border-radius: var(--radius);
+  object-fit: contain;
+}
